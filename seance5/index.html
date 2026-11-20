@@ -66,8 +66,11 @@
 </head>
 <body>
 <header><div class="wrap">
+  <p id="fac" class="meta" style="font-weight:600;color:#fff;display:none"></p>
   <h1>Séance 5 — Atelier pratique : Gemini Notebook</h1>
-  <p>Initiation à l'IA · Digital Skills · Licence en Études amazighes · S5</p>
+  <p>Module : Digital Skills — Initiation à l'IA</p>
+  <p>Licence en Études amazighes · Semestre 5 (S5)</p>
+  <p>Enseignant : Pr. RACHID EL AOUAD</p>
   <p dir="rtl">الحصة 5 — ورشة تطبيقية: Gemini Notebook على مصادر مقدَّمة</p>
 </div></header>
 
@@ -87,6 +90,7 @@
 <script>
 /* ===== À renseigner par l'enseignant : liens de téléchargement des sources ===== */
 const LINKS = { S1:"", S2:"", S3:"", S4:"" };   // ex. "https://drive.google.com/..."
+const FACULTE = "";                              // nom de la faculté (affiché en haut de page)
 const DEADLINE = "";                             // ex. "27 novembre 2026"
 
 /* ===== Contenu ===== */
@@ -179,6 +183,7 @@ const SRC = [
 ];
 
 /* ===== Rendu ===== */
+if (FACULTE) { const f=document.getElementById('fac'); f.textContent=FACULTE; f.style.display='block'; }
 const app = document.getElementById('app');
 const store = { get(k){ try{return localStorage.getItem(k)}catch(e){return null} }, set(k,v){ try{localStorage.setItem(k,v)}catch(e){} } };
 const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
