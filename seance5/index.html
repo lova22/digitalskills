@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Séance 5 — Atelier Gemini Notebook</title>
+<style>
+  :root{--ink:#14213d;--muted:#5a6475;--line:#d9dee7;--bg:#f6f7fa;--card:#fff;--accent:#1f5fae;--ok:#1d7a4d;--warn:#b26a00;--hi:#eaf2fc}
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans Arabic",Arial,sans-serif;color:var(--ink);background:var(--bg)}
+  header{background:var(--ink);color:#fff;padding:28px 20px 24px}
+  .wrap{max-width:860px;margin:0 auto;padding:0 16px}
+  header .wrap{padding:0}
+  h1{margin:0 0 6px;font-size:1.7rem;line-height:1.25}
+  header p{margin:2px 0;color:#c9d3e6}
+  .bar{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line)}
+  .bar .wrap{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:8px 16px}
+  .prog{flex:1;min-width:180px}
+  .prog small{color:var(--muted)}
+  .track{height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin-top:3px}
+  .fill{height:100%;width:0;background:var(--ok);transition:width .25s}
+  .lang button{border:1px solid var(--line);background:#fff;padding:6px 12px;cursor:pointer;font:inherit;font-size:.9rem}
+  .lang button:first-child{border-radius:8px 0 0 8px}.lang button:last-child{border-radius:0 8px 8px 0}
+  .lang button.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  main{padding:20px 0 60px}
+  section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;margin:16px 0}
+  h2{margin:0 0 4px;font-size:1.25rem}
+  .time{color:var(--muted);font-size:.9rem;margin-bottom:10px}
+  .ar{direction:rtl;text-align:right;font-size:1.02rem;margin:4px 0 10px;padding:8px 12px;border-right:3px solid var(--accent);background:var(--hi);border-radius:6px}
+  body.only-fr .ar{display:none}
+  body.only-ar .fr{display:none}
+  body.only-ar .ar{border:0;background:none;padding:0}
+  .step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
+  .step:first-of-type{border-top:0}
+  .step input[type=checkbox]{width:20px;height:20px;margin-top:3px;flex:none;accent-color:var(--ok)}
+  .step .t{flex:1}
+  .step.done .t{opacity:.55}
+  .prompt{position:relative;background:#101828;color:#e8eefc;border-radius:10px;padding:12px 14px 12px 14px;margin:8px 0 4px;font:14px/1.5 ui-monospace,Menlo,Consolas,monospace;white-space:pre-wrap}
+  .copy{position:absolute;top:8px;right:8px;border:1px solid #475467;background:#1d2939;color:#fff;border-radius:7px;padding:3px 10px;font:12px system-ui;cursor:pointer}
+  .copy.ok{background:var(--ok);border-color:var(--ok)}
+  .prompt .p{padding-right:64px;display:block}
+  .tip,.warn,.expect{border-radius:10px;padding:9px 12px;margin:8px 0;font-size:.95rem}
+  .tip{background:var(--hi)} .warn{background:#fff4e0;border:1px solid #f0d6a8} .expect{background:#eaf7f0;border:1px solid #bfe3cf}
+  .tip b,.warn b,.expect b{display:inline-block;margin-right:4px}
+  details{border:1px solid var(--line);border-radius:10px;padding:8px 12px;margin:8px 0;background:#fafbfd}
+  summary{cursor:pointer;font-weight:600}
+  .srcs{display:grid;gap:8px;margin:10px 0}
+  .src{display:flex;justify-content:space-between;gap:10px;align-items:center;border:1px solid var(--line);border-radius:10px;padding:9px 12px;background:#fafbfd}
+  .src small{color:var(--muted);display:block}
+  .tag{font-size:.75rem;background:var(--ink);color:#fff;border-radius:6px;padding:1px 7px;margin-right:6px}
+  a.btn{display:inline-block;background:var(--accent);color:#fff;text-decoration:none;border-radius:8px;padding:6px 12px;font-size:.9rem;white-space:nowrap}
+  a.btn.off{background:#98a2b3;pointer-events:none}
+  table{width:100%;border-collapse:collapse;margin:8px 0;font-size:.93rem}
+  th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+  th{background:#f0f2f6}
+  textarea,input[type=text]{width:100%;font:inherit;border:1px solid var(--line);border-radius:8px;padding:8px;background:#fff;color:var(--ink)}
+  textarea{min-height:70px}
+  label{font-weight:600;font-size:.92rem;display:block;margin:10px 0 3px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  button.main{background:var(--accent);color:#fff;border:0;border-radius:9px;padding:9px 16px;font:inherit;cursor:pointer}
+  button.alt{background:#fff;color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:9px 16px;font:inherit;cursor:pointer}
+  pre.out{white-space:pre-wrap;background:#f0f2f6;border-radius:10px;padding:12px;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace;margin-top:10px;display:none}
+  footer{color:var(--muted);font-size:.85rem;padding:0 0 40px}
+  @media print{.bar,button,.copy{display:none}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>Séance 5 — Atelier pratique : Gemini Notebook</h1>
+  <p>Initiation à l'IA · Digital Skills · Licence en Études amazighes · S5</p>
+  <p dir="rtl">الحصة 5 — ورشة تطبيقية: Gemini Notebook على مصادر مقدَّمة</p>
+</div></header>
+
+<div class="bar"><div class="wrap">
+  <div class="prog"><small id="progtxt">0 / 0</small><div class="track"><div class="fill" id="fill"></div></div></div>
+  <div class="lang" role="group" aria-label="Langue">
+    <button data-l="both" class="on">FR + عربي</button><button data-l="fr">FR</button><button data-l="ar">عربي</button>
+  </div>
+</div></div>
+
+<main><div class="wrap" id="app"></div>
+<div class="wrap"><footer>
+  <p class="fr">Cette page ne collecte aucune donnée : vos réponses restent dans votre navigateur. Les noms de boutons de Gemini Notebook peuvent changer ; si votre écran diffère, décrivez la différence dans votre rendu.</p>
+  <p class="ar">لا تجمع هذه الصفحة أي بيانات: إجاباتكم تبقى في متصفحكم. قد تتغير أسماء الأزرار في Gemini Notebook؛ إن اختلفت شاشتكم فاذكروا الفرق في عملكم.</p>
+</footer></div></main>
+
+<script>
+/* ===== À renseigner par l'enseignant : liens de téléchargement des sources ===== */
+const LINKS = { S1:"", S2:"", S3:"", S4:"" };   // ex. "https://drive.google.com/..."
+const DEADLINE = "";                             // ex. "27 novembre 2026"
+
+/* ===== Contenu ===== */
+const C = [
+ { id:"prep", t:"Avant de commencer", ta:"قبل أن تبدؤوا", time:"5 min", intro:[
+     "Vous allez travailler sur des sources fournies, poser des questions précises, vérifier les citations, puis produire un podcast et une infographie avec Studio. Vous n'avez pas à lire les livres en entier.",
+     "ستشتغلون على مصادر مقدَّمة، وتطرحون أسئلة محددة، وتتحققون من الاستشهادات، ثم تنتجون بودكاست وإنفوغرافيك بأدوات Studio. لا يُطلب منكم قراءة الكتب كاملة."],
+   steps:[
+     ["Ouvrez notebook.google.com avec votre compte Google personnel.","افتحوا notebook.google.com بحسابكم الشخصي على Google."],
+     ["Téléchargez les sources ci-dessous (S3 est facultatif).","حمّلوا المصادر أدناه (S3 اختياري)."],
+     ["Ouvrez le TD (Word) sur Classroom : vous y noterez vos observations et collerez vos captures.","افتحوا ملف TD على Classroom: ستدوّنون فيه ملاحظاتكم وتضعون لقطات الشاشة."]],
+   sources:true,
+   warn:["Les ouvrages sont protégés : usage personnel d'étude uniquement. Ne publiez pas les podcasts ni les infographies générés. N'ajoutez aucune donnée personnelle.","الكتب محمية: للاستعمال الشخصي في الدراسة فقط. لا تنشروا البودكاست أو الإنفوغرافيك الناتجين، ولا تضيفوا أي بيانات شخصية."] },
+
+ { id:"m1", t:"Mission 1 — Construire le notebook", ta:"المهمة 1 — بناء الدفتر", time:"15 min", intro:[
+     "Créez un notebook et ajoutez vos sources.","أنشئوا دفتراً وأضيفوا المصادر."],
+   steps:[
+     ["Créez un nouveau notebook.","أنشئوا دفتراً جديداً."],
+     ["Ajoutez S1, S2 et S4 (et S3 si l'outil l'accepte).","أضيفوا S1 وS2 وS4 (وS3 إن قبلته الأداة)."],
+     ["Collez le prompt ci-dessous dans le chat.","الصقوا الطلب أدناه في الدردشة."],
+     ["Ouvrez les premières pages d'une source et vérifiez un point du résumé.","افتحوا الصفحات الأولى من مصدر وتحققوا من نقطة في الملخص."],
+     ["Capture 1 : la liste des sources de votre notebook.","اللقطة 1: قائمة مصادر دفتركم."]],
+   prompt:"Résume en 5 lignes le contenu de chaque source, et précise sa langue. Ne t'appuie que sur les sources.",
+   expect:["Un résumé par source, avec les bonnes langues (français, anglais, arabe).","ملخص لكل مصدر باللغة الصحيحة (فرنسية، إنجليزية، عربية)."],
+   warn:["Une source refusée ou mal lue ? Notez-le dans le TD : c'est une observation utile.","مصدر مرفوض أو مقروء بشكل سيئ؟ دوّنوا ذلك في TD: ملاحظة مفيدة."] },
+
+ { id:"m2", t:"Mission 2 — Questions précises et vérification", ta:"المهمة 2 — أسئلة محددة وتحقق", time:"25 min", intro:[
+     "Posez ces quatre questions. Pour chacune, cliquez sur au moins une citation et comparez avec le texte de la source.","اطرحوا هذه الأسئلة الأربعة. في كل منها اضغطوا على استشهاد واحد على الأقل وقارنوه بنص المصدر."],
+   prompts:[
+     ["Q1 — Question factuelle (S1)","D'après le lexique, quelles sont les voyelles du tachelhit et que dit-on du « e » ? Cite le passage."],
+     ["Q2 — Ancrage et citation (S2)","D'après A Grammar of Amazigh (chapitre Morphology), explique comment se forment le genre et le nombre des noms. Cite le passage et la page. Réponds en français."],
+     ["Q3 — Extraire un texte (S4, arabe)","Dans le Bulletin officiel, choisis un décret ou un arrêté de la page d'index. Donne son numéro, sa date, son objet, puis cite un article. Réponds en arabe, puis en français."],
+     ["Q4 — Question piège (S1)","Quel est le mot tachelhit pour « ordinateur » selon le lexique ? Si ce mot n'est pas dans les sources, dis-le."]],
+   steps:[
+     ["Pour chaque réponse, cliquez sur une citation et lisez le passage d'origine.","في كل جواب اضغطوا على استشهاد واقرؤوا المقطع الأصلي."],
+     ["Dans le TD, notez : exact / approximatif / faux / introuvable.","في TD دوّنوا: صحيح / تقريبي / خاطئ / غير موجود."],
+     ["Capture 2 : une citation ouverte à côté de la réponse.","اللقطة 2: استشهاد مفتوح بجانب الجواب."]],
+   expect:["Q4 : l'outil doit dire qu'il ne trouve pas le mot. S'il en invente un, notez-le : c'est un très bon résultat.","Q4: يجب أن تقول الأداة إنها لا تجد الكلمة. إن اخترعت كلمة فدوّنوا ذلك: نتيجة جيدة جداً."],
+   warn:["Si le texte arabe est mal lu, essayez une autre page du bulletin et dites-le dans le TD.","إن قُرئ النص العربي بشكل سيئ فجرّبوا صفحة أخرى من الجريدة وسجّلوا ذلك في TD."] },
+
+ { id:"m3", t:"Mission 3 — Studio : le podcast", ta:"المهمة 3 — Studio: البودكاست", time:"30 min", intro:[
+     "Générez un podcast à partir des sources, puis vérifiez ce qu'il raconte.","أنتجوا بودكاست من المصادر، ثم تحققوا مما يقوله."],
+   steps:[
+     ["Dans Studio, choisissez l'aperçu audio (Audio Overview / podcast).","في Studio اختاروا الملخص الصوتي (Audio Overview / بودكاست)."],
+     ["Si l'option existe, précisez le thème et la langue. Utilisez le prompt ci-dessous.","إن وُجد الخيار فحدّدوا الموضوع واللغة. استعملوا الطلب أدناه."],
+     ["Attendez la génération, puis écoutez au moins 3 minutes.","انتظروا انتهاء التوليد ثم استمعوا 3 دقائق على الأقل."],
+     ["Relevez 3 affirmations et vérifiez-les dans les sources.","دوّنوا 3 ادعاءات وتحققوا منها في المصادر."],
+     ["Notez la prononciation des mots amazighes (correcte, déformée, absente).","دوّنوا نطق الكلمات الأمازيغية (صحيح، مشوّه، غائب)."],
+     ["Capture 3 : le podcast dans Studio.","اللقطة 3: البودكاست في Studio."]],
+   prompt:"Thème : « Les noms en tamazight : genre et nombre, avec des exemples tirés du lexique ». Public : étudiants de licence en études amazighes. Ton : clair, pédagogique. N'utilise que les sources et signale ce qui n'y figure pas.",
+   warn:["Le podcast peut contenir des erreurs ou des informations absentes des sources : c'est exactement ce que vous cherchez. Si le podcast n'est pas disponible ou si vous atteignez une limite, choisissez un autre support (résumé, carte mentale) et dites-le dans le TD.","قد يحتوي البودكاست على أخطاء أو معلومات غير موجودة في المصادر، وهذا ما تبحثون عنه. إن لم يتوفر أو بلغتم حد الاستعمال فاختاروا دعامة أخرى (ملخص، خريطة ذهنية) وسجّلوا ذلك في TD."] },
+
+ { id:"m4", t:"Mission 4 — Studio : l'infographie", ta:"المهمة 4 — Studio: الإنفوغرافيك", time:"25 min", intro:[
+     "Produisez une infographie à partir d'un passage précis, puis relisez-la comme un correcteur.","أنتجوا إنفوغرافيك من مقطع محدد، ثم راجعوه كمصحّح."],
+   steps:[
+     ["Choisissez un passage de S2, par exemple « Tense/Aspect Categories » ou le chapitre sur les voyelles.","اختاروا مقطعاً من S2، مثل «Tense/Aspect Categories» أو فصل الصوائت."],
+     ["Dans Studio, lancez la création d'une infographie avec le prompt ci-dessous.","في Studio ابدؤوا إنشاء إنفوغرافيك بالطلب أدناه."],
+     ["Relisez : le texte est-il exact ? les mots amazighes sont-ils bien écrits ? y a-t-il des ajouts inventés ?","راجعوا: هل النص دقيق؟ هل كُتبت الكلمات الأمازيغية جيداً؟ هل توجد إضافات مختلقة؟"],
+     ["Notez au moins une erreur ou un doute, et ce que vous corrigeriez.","دوّنوا خطأً أو شكاً واحداً على الأقل، وما ستصححونه."],
+     ["Capture 4 : l'infographie.","اللقطة 4: الإنفوغرافيك."]],
+   prompt:"Crée une infographie pour des étudiants de licence à partir du chapitre « Tense/Aspect Categories » de A Grammar of Amazigh. 5 idées maximum, avec un exemple par idée. N'ajoute aucune information qui ne figure pas dans la source.",
+   warn:["Si l'infographie n'est pas disponible pour votre compte, choisissez une présentation, une carte mentale ou un tableau de données, et dites-le dans le TD.","إن لم يتوفر الإنفوغرافيك لحسابكم فاختاروا عرضاً أو خريطة ذهنية أو جدول بيانات، وسجّلوا ذلك في TD."] },
+
+ { id:"m5", t:"Mission 5 — Tester l'amazighe", ta:"المهمة 5 — اختبار الأمازيغية", time:"15 min", intro:[
+     "Mettez l'outil à l'épreuve avec le lexique, puis jugez-le avec votre propre connaissance de la langue.","اختبروا الأداة بالمعجم، ثم احكموا عليها بمعرفتكم باللغة."],
+   steps:[
+     ["Choisissez 10 mots du lexique (S1).","اختاروا 10 كلمات من المعجم (S1)."],
+     ["Collez le prompt ci-dessous avec vos 10 mots.","الصقوا الطلب أدناه مع كلماتكم العشر."],
+     ["Comparez avec ce que vous savez : bon, douteux, faux ou inventé.","قارنوا بما تعرفونه: صحيح، مشكوك فيه، خاطئ أو مختلق."],
+     ["Demandez 3 phrases simples avec ces mots et jugez-les.","اطلبوا 3 جمل بسيطة بهذه الكلمات واحكموا عليها."],
+     ["Recopiez au moins 5 mots testés dans le TD.","انسخوا 5 كلمات مختبَرة على الأقل في TD."]],
+   prompt:"Voici 10 mots du lexique : [vos mots]. Donne-moi un tableau : mot français / tachelhit tel qu'il figure dans le lexique / écriture en tifinagh. Si tu n'es pas sûr d'une forme, écris « incertain » plutôt que d'inventer.",
+   warn:["Le lexique écrit les mots en transcription phonétique avec des lettres françaises, pas en orthographe IRCAM. Cela peut troubler l'outil : notez ce que vous observez.","يكتب المعجم الكلمات بنطق صوتي بحروف فرنسية وليس بإملاء IRCAM. قد يربك هذا الأداة: دوّنوا ما تلاحظونه."] },
+
+ { id:"fin", t:"Rendre votre travail", ta:"تسليم العمل", time:"10 min", intro:[
+     "Préparez votre rendu, puis déposez-le sur Classroom.","جهّزوا عملكم ثم ارفعوه على Classroom."],
+   steps:[
+     ["Quatre captures d'écran insérées dans le TD (notebook, citation, podcast, infographie).","أربع لقطات شاشة داخل ملف TD (الدفتر، الاستشهاد، البودكاست، الإنفوغرافيك)."],
+     ["Tableaux remplis et bilan personnel écrit (10 lignes maximum).","الجداول مملوءة والحصيلة الشخصية مكتوبة (10 أسطر كحد أقصى)."],
+     ["Nom du fichier : NOM_Prenom_Seance5 (Word ou PDF).","اسم الملف: NOM_Prenom_Seance5 (Word أو PDF)."],
+     ["Rendu sur Classroom avant la date limite.","التسليم على Classroom قبل الموعد النهائي."]],
+   recap:true }
+];
+
+const SRC = [
+ ["S1","Lexique amazigh-français (tachelhit du Souss)","36 p. · FR","معجم أمازيغي-فرنسي (تشلحيت سوس)"],
+ ["S2","A Grammar of Amazigh — Sadiqi & Ennaji (2004)","170 p. · EN","نحو الأمازيغية بالإنجليزية"],
+ ["S3","La nouvelle grammaire de l'amazighe — IRCAM (2008) · facultatif, PDF protégé","199 p. · FR","النحو الجديد للأمازيغية (اختياري)"],
+ ["S4","Bulletin officiel n° 6831 (18 novembre 2019)","86 p. · AR","الجريدة الرسمية عدد 6831"]
+];
+
+/* ===== Rendu ===== */
+const app = document.getElementById('app');
+const store = { get(k){ try{return localStorage.getItem(k)}catch(e){return null} }, set(k,v){ try{localStorage.setItem(k,v)}catch(e){} } };
+const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const dual = (fr, ar, cls='') => `<div class="fr ${cls}">${esc(fr)}</div><div class="ar">${esc(ar)}</div>`;
+let n = 0; const boxes = [];
+
+C.forEach(sec => {
+  const el = document.createElement('section'); el.id = sec.id;
+  let h = `<h2>${esc(sec.t)}</h2><div class="ar" style="margin-top:0">${esc(sec.ta)}</div><div class="time">⏱ ${esc(sec.time)}${sec.id==='prep'&&DEADLINE?` · Date limite : ${esc(DEADLINE)}`:''}</div>`;
+  h += dual(sec.intro[0], sec.intro[1]);
+  if (sec.sources) {
+    h += '<div class="srcs">' + SRC.map(s => {
+      const l = LINKS[s[0]];
+      return `<div class="src"><div><span class="tag">${s[0]}</span><b>${esc(s[1])}</b><small>${esc(s[2])} · <span dir="rtl">${esc(s[3])}</span></small></div>${l?`<a class="btn" href="${esc(l)}" target="_blank" rel="noopener">Télécharger</a>`:'<a class="btn off">Lien sur Classroom</a>'}</div>`;
+    }).join('') + '</div>';
+  }
+  sec.steps.forEach((s,i) => {
+    const key = `s5_${sec.id}_${i}`; n++;
+    h += `<div class="step" data-k="${key}"><input type="checkbox" id="${key}"><label class="t" for="${key}" style="font-weight:400;margin:0">${dual(s[0], s[1])}</label></div>`;
+    boxes.push(key);
+  });
+  if (sec.prompt) h += `<div class="prompt"><button class="copy" type="button">Copier</button><span class="p">${esc(sec.prompt)}</span></div>`;
+  if (sec.prompts) sec.prompts.forEach(p => { h += `<details><summary>${esc(p[0])}</summary><div class="prompt"><button class="copy" type="button">Copier</button><span class="p">${esc(p[1])}</span></div></details>`; });
+  if (sec.expect) h += `<div class="expect"><b>✔ À obtenir / المتوقع :</b>${esc(sec.expect[0])}<div class="ar" style="margin-top:6px">${esc(sec.expect[1])}</div></div>`;
+  if (sec.warn) h += `<div class="warn"><b>⚠ Attention / تنبيه :</b>${esc(sec.warn[0])}<div class="ar" style="margin-top:6px">${esc(sec.warn[1])}</div></div>`;
+  if (sec.recap) h += `
+    <h2 style="margin-top:18px;font-size:1.05rem">Récapitulatif à coller dans le TD <span dir="rtl" style="font-weight:400">/ ملخص يُلصق في TD</span></h2>
+    <label for="r1">Nom et prénom</label><input type="text" id="r1" autocomplete="off">
+    <label for="r2">Sources effectivement chargées (S1…S4) et problèmes rencontrés</label><textarea id="r2"></textarea>
+    <label for="r3">Mission 2 : ce que l'outil a bien fait / ce qu'il a inventé</label><textarea id="r3"></textarea>
+    <label for="r4">Missions 3 et 4 : support utilisé, une erreur repérée</label><textarea id="r4"></textarea>
+    <label for="r5">Mission 5 : verdict sur l'amazighe</label><textarea id="r5"></textarea>
+    <label for="r6">Règle d'usage que je retiens</label><textarea id="r6"></textarea>
+    <div class="actions"><button class="main" id="gen" type="button">Générer le récapitulatif</button><button class="alt" id="cp" type="button">Copier</button><button class="alt" id="clr" type="button">Tout effacer</button></div>
+    <pre class="out" id="out"></pre>
+    <div class="tip" style="margin-top:12px"><b>ℹ</b>Ce récapitulatif n'est pas envoyé : copiez-le puis collez-le dans votre fichier TD.</div>`;
+  el.innerHTML = h; app.appendChild(el);
+});
+
+/* progression */
+const prog = () => {
+  const done = boxes.filter(k => document.getElementById(k).checked).length;
+  document.getElementById('progtxt').textContent = `${done} / ${boxes.length} étapes · ${done} / ${boxes.length} خطوة`;
+  document.getElementById('fill').style.width = (100*done/boxes.length) + '%';
+};
+boxes.forEach(k => {
+  const cb = document.getElementById(k);
+  cb.checked = store.get(k) === '1';
+  cb.closest('.step').classList.toggle('done', cb.checked);
+  cb.addEventListener('change', () => { store.set(k, cb.checked ? '1':'0'); cb.closest('.step').classList.toggle('done', cb.checked); prog(); });
+});
+prog();
+
+/* copier */
+document.addEventListener('click', e => {
+  const b = e.target.closest('.copy'); if (!b) return;
+  const txt = b.parentElement.querySelector('.p').textContent;
+  const done = () => { b.textContent = 'Copié ✓'; b.classList.add('ok'); setTimeout(()=>{b.textContent='Copier'; b.classList.remove('ok')},1500); };
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(txt).then(done, () => fallback(txt, done));
+  else fallback(txt, done);
+});
+function fallback(t, cb){ const a=document.createElement('textarea'); a.value=t; document.body.appendChild(a); a.select(); try{document.execCommand('copy'); cb&&cb()}catch(e){} a.remove(); }
+
+/* récapitulatif */
+const ids = ['r1','r2','r3','r4','r5','r6'];
+ids.forEach(i => { const f=document.getElementById(i); f.value = store.get('s5_'+i) || ''; f.addEventListener('input', () => store.set('s5_'+i, f.value)); });
+const build = () => {
+  const g = i => document.getElementById(i).value.trim() || '(non renseigné)';
+  return `SÉANCE 5 — RÉCAPITULATIF\nNom : ${g('r1')}\nSources chargées / problèmes : ${g('r2')}\nMission 2 : ${g('r3')}\nMissions 3 et 4 : ${g('r4')}\nMission 5 : ${g('r5')}\nRègle d'usage retenue : ${g('r6')}`;
+};
+document.getElementById('gen').addEventListener('click', () => { const o=document.getElementById('out'); o.textContent=build(); o.style.display='block'; });
+document.getElementById('cp').addEventListener('click', () => { const t=build(); const o=document.getElementById('out'); o.textContent=t; o.style.display='block'; (navigator.clipboard&&window.isSecureContext)?navigator.clipboard.writeText(t).catch(()=>fallback(t)):fallback(t); });
+document.getElementById('clr').addEventListener('click', () => { if(confirm('Effacer le récapitulatif ?')) { ids.forEach(i => { document.getElementById(i).value=''; store.set('s5_'+i,''); }); document.getElementById('out').style.display='none'; } });
+
+/* langue */
+const setLang = l => { document.body.classList.remove('only-fr','only-ar'); if(l==='fr') document.body.classList.add('only-fr'); if(l==='ar') document.body.classList.add('only-ar'); document.querySelectorAll('.lang button').forEach(b=>b.classList.toggle('on', b.dataset.l===l)); store.set('s5_lang', l); };
+document.querySelectorAll('.lang button').forEach(b => b.addEventListener('click', () => setLang(b.dataset.l)));
+setLang(store.get('s5_lang') || 'both');
+</script>
+</body>
+</html>
